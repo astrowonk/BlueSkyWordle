@@ -1,6 +1,6 @@
 
 
-### For full details, see my [blog post](/posts/wordle_bluesky/) and the [Github repository](https://github.com/astrowonk/BlueSkyWordle).
+### For full details, see my [blog post](https://marcoshuerta.com/posts/wordle_bluesky/) and the [Github repository](https://github.com/astrowonk/BlueSkyWordle).
 
 ------
 
