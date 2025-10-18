@@ -3,7 +3,9 @@
 
 
 ------
-### For full details, see my [blog post](/posts/wordle_bluesky/).
+
+#### For full details, see my [blog post](/posts/wordle_bluesky/) and the [Github repository](https://github.com/astrowonk/BlueSkyWordle).
+
 ------
 In short, I use the BlueSky API to find social media shares for a given Wordle number. i.e.
 

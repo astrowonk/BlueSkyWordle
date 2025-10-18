@@ -110,7 +110,7 @@ tab1_content = html.Div(
     ]
 )
 
-with open('about_tab.md', 'r') as f:
+with open('README.md', 'r') as f:
     tab_about_content = f.read()
 
 with sqlite3.connect('wordle.db') as con:
