@@ -340,8 +340,9 @@ Ties are broken by the normalized score.
 If this seems like a hacky post-hoc heuristic, [it definitely is!](https://marcoshuerta.com/posts/wordle_bluesky)
 
 """
+
     print('making table')
-    thetable = dbc.Table.from_enhanced_dataframe(
+    thetable_div = dbc.Table.from_enhanced_dataframe(
         solution_data.select(cols)
         .rename({'word': 'candidate'})
         .to_pandas(use_pyarrow_extension_array=True),
@@ -350,7 +351,7 @@ If this seems like a hacky post-hoc heuristic, [it definitely is!](https://marco
 
     res = [
         dcc.Graph(figure=fig, id='the-graph'),
-        [dcc.Markdown(markdown_text, style={'text-align': 'left'}), thetable],
+        [dcc.Markdown(markdown_text, style={'text-align': 'left'}), thetable_div],
         #    f'{solution}|{wordle_num}',
     ]
     print('returning from callback')
@@ -388,12 +389,18 @@ def make_menu(_, search, active_tab):
     else:
         value = 'frank|821'
     return (
-        dcc.Dropdown(
-            id='wordle-input',
-            placeholder='Choose or Enter Wordle Solution',
-            options=options_wordle,
-            value=value,
-            clearable=False,
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Wordle Solution: '),
+                dbc.Select(
+                    id='wordle-input',
+                    placeholder='Choose or Enter Wordle Solution',
+                    options=options_wordle,
+                    value=value,
+                    #  style={'width': '75%'},
+                ),
+            ],
+            style={'width': '55%', 'margin': 'auto'},
         ),
         'main-tab',
     )

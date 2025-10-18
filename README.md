@@ -1,12 +1,11 @@
 
-## Solving Wordles with Social Media Shares
 
-
-------
-
-#### For full details, see my [blog post](/posts/wordle_bluesky/) and the [Github repository](https://github.com/astrowonk/BlueSkyWordle).
+### For full details, see my [blog post](/posts/wordle_bluesky/) and the [Github repository](https://github.com/astrowonk/BlueSkyWordle).
 
 ------
+
+#### Solving Wordles with Social Media Shares
+
 In short, I use the BlueSky API to find social media shares for a given Wordle number. i.e.
 
 ```
