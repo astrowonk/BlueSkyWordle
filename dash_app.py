@@ -439,14 +439,14 @@ def update_pattern_on_click(click_data, word_wordle_tuple):
 
     weird_word_list = (
         num_pattern_df.with_columns(max_freq=pl.col('freq').max().over('pattern'))
-        .filter(pl.col('freq').eq(0) & pl.col('count').eq(1) & pl.col('max_freq').eq(0))[
+        .filter(pl.col('freq').lt(1e5) & pl.col('count').eq(1) & pl.col('max_freq').lt(1e5))[
             'guess'
         ]
         .to_list()
     )
     augmented_list = [f'*{x}*' for x in weird_word_list]
     weird_guess_children = dcc.Markdown(
-        '**Weird Implied Guesses:** ' + ', '.join(augmented_list)
+        '**Unusual Implied Guesses:** ' + ', '.join(augmented_list)
     )
 
     # weird_guesses = num_pattern_df.filter(pl.col('count').eq(1) & pl.col('freq').eq(0))['word'].to_list()
