@@ -192,9 +192,9 @@ app.layout = dbc.Container([tabs, dcc.Location(id='url', refresh=False)])
 
 def wrap_pattern(pattern_tuple, solution, num_pattern_df, impossible_patterns=[]):
     pattern, count = pattern_tuple
-    top_words_for_pattern = num_pattern_df.filter(pl.col('pattern').eq(pattern))[
-        'guess'
-    ].to_list()
+    top_words_for_pattern = (
+        num_pattern_df.filter(pl.col('pattern').eq(pattern))['guess'].sort().to_list()
+    )
     # print(pattern, impossible_patterns)
     return html.Div(
         [
@@ -451,7 +451,7 @@ def update_pattern_on_click(click_data, word_wordle_tuple):
             .select(['pattern', 'count'])
             .iter_rows()
         ],
-        key=lambda x: -x[1],
+        key=lambda x: (-x[1], x[0]),
     )
     print(patterns, label)
 
