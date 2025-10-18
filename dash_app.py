@@ -13,6 +13,24 @@ import dash_dataframe_table
 parent_dir = Path().absolute().stem
 
 
+def make_headline_info_div(headline, tooltip_text, id):
+    return html.Div(
+        children=[
+            html.H3(headline, style={'display': 'inline-block'}),
+            html.I(
+                id=id,
+                className='bi bi-info-circle-fill me-2',
+                style={'display': 'inline-block', 'padding': '.5em'},
+            ),
+            dbc.Tooltip(
+                dcc.Markdown(tooltip_text),
+                target=id,
+                trigger='legacy',
+            ),
+        ],
+    )
+
+
 def get_date(wordle_num):
     return (
         datetime.datetime(2021, 6, 19) + datetime.timedelta(days=int(wordle_num))
@@ -452,9 +470,17 @@ def update_pattern_on_click(click_data, word_wordle_tuple):
     # weird_guesses = num_pattern_df.filter(pl.col('count').eq(1) & pl.col('freq').eq(0))['word'].to_list()
     res = (
         [
-            dcc.Markdown(f'## Highlighting Impossible Patterns for **{label}**')
+            make_headline_info_div(
+                f'Highlighting Impossible Patterns for {label.upper()}',
+                f'Any patterns that can not be made if {label} was solution.',
+                id='highlight-impossible',
+            )
             if patterns
-            else dcc.Markdown(f'## Showing all Shared Patterns'),
+            else make_headline_info_div(
+                'Showing all Shared Patterns',
+                'Patterns found on Blue Sky shared for this Wordle. Hover to see the number of times the pattern appeared, and common words associated with this pattern for the solution.',
+                id='standard-all-shared-patterns',
+            ),
             html.Div(
                 [
                     wrap_pattern(
