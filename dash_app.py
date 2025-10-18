@@ -344,7 +344,7 @@ def update_code(search, word_wordle_tuple):
             'metric_sum',
             'is_solution',
         ]
-        markdown_text = f"""The score-only methodology produced a weak candidate (and possibly wrong) for this dataset. Data was reranked using the "metric sum" which is the sum of:
+        markdown_text = f"""The score-only methodology produced a weak  (and possibly wrong) candidate for this dataset. Data was reranked using the "metric sum" which is the sum of:
         
 * The rank of my original normalized score metric
 * The rank of the [two-sample Kolmogorov-Smirnov test](https://docs.scipy.org/doc/scipy-1.11.4/reference/generated/scipy.stats.ks_2samp.html) based on opener frequency
