@@ -4,6 +4,7 @@ import datetime
 import hashlib
 import json
 import sqlite3
+import gzip
 from collections import Counter, defaultdict
 
 import pandas as pd
@@ -50,11 +51,15 @@ class BlueskyWordle:
             use smaller solution dictionary, by default True
         """
         self.filter_posts = filter_posts
-        file_name = 'all-words-counters-2025.json'
+        file_name = 'all-words-counters-2025.json.gz'
         if use_limited_targets:
             file_name = 'zipped_counters_nyt_2025_update.json'
-        with open(file_name, 'r') as f:
-            self.zipped_counters = json.load(f)
+        if file_name.endswith('.gz'):
+            with gzip.open(file_name, 'r') as f:
+                self.zipped_counters = json.load(f)
+        else:
+            with open(file_name, 'r') as f:
+                self.zipped_counters = json.load(f)
         print(
             f'Loaded {len(self.zipped_counters)} pre-computed lookup dictionaries from {file_name}.'
         )
