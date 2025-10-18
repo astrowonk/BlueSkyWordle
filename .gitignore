@@ -1,0 +1,6 @@
+config.py
+__pycache__/
+*.ipynb
+wordle.db
+wordle_old.db
+wordle_backup.db
