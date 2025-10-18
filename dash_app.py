@@ -100,6 +100,7 @@ tab1_content = html.Div(
                                 dbc.Col(html.Div(id='graph-div')),
                             ],
                         ),
+                        dbc.Row(html.Div(id='weird-guesses')),
                         dbc.Row(html.Div(id='table-div')),
                     ]
                 )
@@ -171,14 +172,11 @@ tabs = dbc.Tabs(
 app.layout = dbc.Container([tabs, dcc.Location(id='url', refresh=False)])
 
 
-def wrap_pattern(pattern_tuple, solution, impossible_patterns=[]):
+def wrap_pattern(pattern_tuple, solution, num_pattern_df, impossible_patterns=[]):
     pattern, count = pattern_tuple
-    with sqlite3.connect('wordle.db') as con:
-        top_words_for_pattern = pl.read_database(
-            'select guess from patterns where pattern = ? and target = ? ',
-            connection=con,
-            execute_options={'parameters': [pattern, solution]},
-        )['guess'].to_list()
+    top_words_for_pattern = num_pattern_df.filter(pl.col('pattern').eq(pattern))[
+        'guess'
+    ].to_list()
     # print(pattern, impossible_patterns)
     return html.Div(
         [
@@ -408,6 +406,7 @@ def make_menu(_, search, active_tab):
 
 @callback(
     Output('pattern-div', 'children', allow_duplicate=False),
+    Output('weird-guesses', 'children'),
     Input('the-graph', 'clickData'),
     State('wordle-input', 'value'),
     prevent_initial_call=False,
@@ -423,32 +422,59 @@ def update_pattern_on_click(click_data, word_wordle_tuple):
         label = click_data['points'][0]['label']
     with sqlite3.connect('wordle.db') as con:
         num_pattern_df = pl.read_database(
-            'select * from pattern_counts where wordle_id = ?',
+            'select p.pattern,count,freq,wordle_id,guess from pattern_counts pc left join patterns p on p.pattern = pc.pattern  where wordle_id = ? and target = ? order by 1;',
             connection=con,
-            execute_options={'parameters': [wordle_num]},
+            execute_options={'parameters': [wordle_num, solution]},
         )
     num_pattern_list = sorted(
-        [(key, val) for key, val in num_pattern_df.select(['pattern', 'count']).iter_rows()],
+        [
+            (key, val)
+            for key, val in num_pattern_df.unique(subset=['pattern', 'count'])
+            .select(['pattern', 'count'])
+            .iter_rows()
+        ],
         key=lambda x: -x[1],
     )
     print(patterns, label)
-    res = [
-        dcc.Markdown(f'## Highlighting Impossible Patterns for **{label}**')
-        if patterns
-        else dcc.Markdown(f'## Showing all Shared Patterns'),
-        html.Div(
-            [
-                wrap_pattern(x, solution=solution, impossible_patterns=patterns)
-                for x in num_pattern_list
-            ],
-            style={
-                'display': 'flex',
-                'flex-wrap': 'wrap',
-                'gap': '5px',
-                'margin': '5px',
-            },
-        ),
-    ]
+
+    weird_word_list = (
+        num_pattern_df.with_columns(max_freq=pl.col('freq').max().over('pattern'))
+        .filter(pl.col('freq').eq(0) & pl.col('count').eq(1) & pl.col('max_freq').eq(0))[
+            'guess'
+        ]
+        .to_list()
+    )
+    augmented_list = [f'*{x}*' for x in weird_word_list]
+    weird_guess_children = dcc.Markdown(
+        '**Weird Implied Guesses:** ' + ', '.join(augmented_list)
+    )
+
+    # weird_guesses = num_pattern_df.filter(pl.col('count').eq(1) & pl.col('freq').eq(0))['word'].to_list()
+    res = (
+        [
+            dcc.Markdown(f'## Highlighting Impossible Patterns for **{label}**')
+            if patterns
+            else dcc.Markdown(f'## Showing all Shared Patterns'),
+            html.Div(
+                [
+                    wrap_pattern(
+                        x,
+                        solution=solution,
+                        impossible_patterns=patterns,
+                        num_pattern_df=num_pattern_df,
+                    )
+                    for x in num_pattern_list
+                ],
+                style={
+                    'display': 'flex',
+                    'flex-wrap': 'wrap',
+                    'gap': '5px',
+                    'margin': '5px',
+                },
+            ),
+        ],
+        weird_guess_children,
+    )
 
     return res
 
