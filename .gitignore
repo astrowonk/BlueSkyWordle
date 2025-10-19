@@ -4,3 +4,4 @@ __pycache__/
 wordle.db
 wordle_old.db
 wordle_backup.db
+*.html
