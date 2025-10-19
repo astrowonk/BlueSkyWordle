@@ -168,7 +168,7 @@ tab2_content = f"""
 * Failed Wordles (Norm score metric only): {df_bad_norm_scores.shape[0]}
 * Failed Wordles (KS Statistic Rank only): {df_bad_kstats.shape[0]}
 * Failed Wordles (Fraction Found Rank only): {df_bad_fraction_found.shape[0]}
-* Percentage Solved Correctly with Current Algorithm: {df_pct_correct:.1%}
+* Percentage Solved Correctly with Current Algorithm: **{df_pct_correct:.1%}**
 
 """
 
