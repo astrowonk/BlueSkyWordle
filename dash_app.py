@@ -407,7 +407,7 @@ def make_menu(_, search, active_tab):
     return (
         dbc.InputGroup(
             [
-                dbc.InputGroupText('Wordle Solution: '),
+                dbc.InputGroupText('Chooose a Wordle Solution: '),
                 dbc.Select(
                     id='wordle-input',
                     placeholder='Choose or Enter Wordle Solution',
@@ -416,7 +416,12 @@ def make_menu(_, search, active_tab):
                     #  style={'width': '75%'},
                 ),
             ],
-            style={'width': '55%', 'margin': 'auto'},
+            style={
+                'width': '55%',
+                'margin': 'auto',
+                'padding-bottom': '2em',
+                'padding-top': '1em',
+            },
         ),
         'main-tab',
     )
@@ -473,7 +478,7 @@ def update_pattern_on_click(click_data, word_wordle_tuple):
         [
             make_headline_info_div(
                 f'Highlighting Impossible Patterns for {label.upper()}',
-                f'Any patterns that can not be made if {label} was solution.',
+                f'These are "impossible" patterns that can not be made if **{label}** was the solution.',
                 id='highlight-impossible',
             )
             if patterns

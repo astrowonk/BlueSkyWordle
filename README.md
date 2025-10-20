@@ -18,9 +18,9 @@ Wordle 1,575 5/6
 🟩🟩🟩🟩🟩
 ```
 
-Because different possible solutions have different possible score lines (and different likelihood of these lines), I can "solve" the Wordle and figure out the solution just by analyzing a few hundred social media shares. Finding the right heuristics to solve every Wordle involved a lot of post-hoc metrics, but now it works.
+Then I use the patterns and their counts to figure out the solution to the Wordle based only on the shared scores, because not every pattern can be made for every word, and some patterns are more likely for certain words than others. Finding the right heuristics to solve every Wordle involved a lot of post-hoc metrics, but now it works.
 
-This web app explores the several hundred Wordles I have solved using shares from Blue Sky. Metrics used to rank the candidates:
+This web app explores the several hundred Wordles I have solved this way, using shares from Blue Sky. The metrics I now use to rank the candidates:
 
 #### **Fraction found.** 
 
