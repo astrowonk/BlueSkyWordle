@@ -22,9 +22,13 @@ Then I use the patterns and their counts to figure out the solution to the Wordl
 
 This web app explores the several hundred Wordles I have solved this way, using shares from Blue Sky. The metrics I now use to rank the candidates:
 
+#### **Normalized Score**
+
+This is the original technique I used in TwitterWordle - using word frequency data, this is a running sum of the likelihood of each pattern based on the word frequency of the words that could create that pattern, minus a penalty term for any "impossible" patterns for that solution. This is then normalized to a mean of 0, standard deviation of 1, and used to rank the candidates.
+
 #### **Fraction found.** 
 
-What fraction of the candidate word's total possible patterns were found in the social media shares? (Note: this was upwards of 90% in Twitter data when I had 5000 or more posts, now it's usually in the 50-60% range)
+What fraction of the candidate word's total possible patterns were found in the social media shares? (Note: this was upwards of 90% in Twitter data when I had 5000 or more posts, now it's usually in the 50-70% range)
 
 #### **KS Statistic based on Opener Frequency**
 
