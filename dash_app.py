@@ -182,6 +182,12 @@ tabs = dbc.Tabs(
         ),
         dbc.Tab(dcc.Markdown(tab2_content), label='Statistics', tab_id='stat-tab'),
         dbc.Tab(dcc.Markdown(tab_about_content), label='About'),
+        dbc.Tab(
+            html.Div(
+                id='bad-solution-tab',
+            ),
+            label='List of Near-Fails',
+        ),
     ],
     active_tab='main-tab',
     id='some-tabs',
@@ -237,6 +243,27 @@ def update_url(wordle_input):
         return '?word=' + word
     else:
         raise PreventUpdate
+
+
+@callback(
+    Output('bad-solution-tab', 'children'),
+    Input('some-tabs', 'children'),
+)
+def make_table_div(_):
+    with sqlite3.connect('wordle.db') as con:
+        print('reading solutions db')
+        df = (
+            pl.read_database(
+                'select word, norm_score_rank,impossible_pattern_count,cast(metric_sum as INTEGER) metric_sum,metric_sum_rank from ranked_view where is_solution  = 1 and norm_score_rank <> 1 order by 2 DESC',
+                connection=con,
+            )
+            .with_columns(
+                word_HREF=(pl.lit('/?word=') + pl.col('word')),
+            )
+            .to_pandas(use_pyarrow_extension_array=True)
+        )
+
+    return dbc.Table.from_enhanced_dataframe(df, striped=True)
 
 
 @callback(
@@ -363,6 +390,7 @@ If this seems like a hacky post-hoc heuristic, [it definitely is!](https://marco
         .rename({'word': 'candidate'})
         .to_pandas(use_pyarrow_extension_array=True),
         header_callable=add_header_tooltip,
+        striped=True,
     )
 
     res = [
