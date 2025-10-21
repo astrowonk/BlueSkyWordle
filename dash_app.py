@@ -358,7 +358,10 @@ def update_code(search, word_wordle_tuple):
         'is_solution',
     ]
     markdown_text = ''
-    if solution_data['norm_score'].item(0) - solution_data['norm_score'].item(1) < 0.10:
+    check_data = solution_data.sort('norm_score', descending=True)
+    if (check_data['norm_score'].item(0) - check_data['norm_score'].item(1) < 0.10) or (
+        check_data['impossible_pattern_count'].item(0) > 1
+    ):
         cols = [
             'word',
             'impossible_pattern_count',
@@ -371,7 +374,7 @@ def update_code(search, word_wordle_tuple):
             'metric_sum',
             'is_solution',
         ]
-        markdown_text = f"""The score-only methodology produced a weak  (and possibly wrong) candidate for this dataset. Data was reranked using the "metric sum" which is the sum of:
+        markdown_text = f"""The score-only methodology produced a weak (and possibly wrong) candidate for this dataset. Data was reranked using the "metric sum" which is the sum of:
         
 * The rank of my original normalized score metric
 * The rank of the [two-sample Kolmogorov-Smirnov test](https://docs.scipy.org/doc/scipy-1.11.4/reference/generated/scipy.stats.ks_2samp.html) based on opener frequency
