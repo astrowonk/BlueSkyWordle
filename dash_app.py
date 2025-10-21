@@ -141,6 +141,10 @@ with sqlite3.connect('wordle.db') as con:
         'select avg(is_solution) is_solution from (select word,is_solution from solutions group by wordle_id having min(rowid) order by rowid);',
         connection=con,
     )['is_solution'].item(0)
+    df_last_correct = pl.read_database(
+        'select word,is_solution from solutions where wordle_id = (select max(wordle_id) from solutions) order by rowid limit 1;',
+        connection=con,
+    )['is_solution'].item(0)
     max_wordle = df['wordle_id'].item(0)
     num_solutions = df['count'].item(0)
     max_date = get_date(wordle_num=max_wordle)
@@ -159,7 +163,7 @@ with sqlite3.connect('wordle.db') as con:
     )
 
 
-tab2_content = f"""
+tab2_markdown_text = f"""
 
 ## Statistics
 
@@ -172,6 +176,8 @@ tab2_content = f"""
 
 """
 
+result = '✅' if df_last_correct == 1 else '🚫'
+
 tabs = dbc.Tabs(
     [
         dbc.Tab(
@@ -180,8 +186,14 @@ tabs = dbc.Tabs(
             tab_id='main-tab',
             id='main-tab',
         ),
-        dbc.Tab(dcc.Markdown(tab2_content), label='Statistics', tab_id='stat-tab'),
-        dbc.Tab(dcc.Markdown(tab_about_content), label='About'),
+        dbc.Tab(
+            [
+                dcc.Markdown(tab2_markdown_text),
+            ],
+            label='Statistics',
+            tab_id='stat-tab',
+        ),
+        dbc.Tab(dcc.Markdown(tab_about_content, style={'padding-top': '1em'}), label='About'),
         dbc.Tab(
             html.Div(
                 id='bad-solution-tab',
@@ -193,7 +205,24 @@ tabs = dbc.Tabs(
     id='some-tabs',
 )
 
-app.layout = dbc.Container([tabs, dcc.Location(id='url', refresh=False)])
+app.layout = dbc.Container(
+    [
+        tabs,
+        dcc.Location(id='url', refresh=False),
+        dbc.Toast(
+            dcc.Markdown(
+                f'Wordle on {max_date}. Solution was {bool(df_last_correct)} - {result}'
+            ),
+            id='positioned-toast',
+            header='Latest Result',
+            is_open=True,
+            dismissable=True,
+            icon='success' if df_last_correct else 'danger',
+            # top: 66 positions the toast below the navbar
+            style={'position': 'fixed', 'top': 66, 'right': 50, 'width': 350},
+        ),
+    ],
+)
 
 
 def wrap_pattern(pattern_tuple, solution, num_pattern_df, impossible_patterns=[]):
@@ -258,12 +287,19 @@ def make_table_div(_):
                 connection=con,
             )
             .with_columns(
-                word_HREF=(pl.lit('/?word=') + pl.col('word')),
+                word_HREF=(pl.lit('?word=') + pl.col('word')),
             )
             .to_pandas(use_pyarrow_extension_array=True)
         )
 
-    return dbc.Table.from_enhanced_dataframe(df, striped=True)
+    return [
+        html.H3('Wordles where the Score-only method failed', style={'padding-top': '1em'}),
+        dbc.Table.from_enhanced_dataframe(
+            df,
+            striped=True,
+            style={'width': '75%'},
+        ),
+    ]
 
 
 @callback(
@@ -315,8 +351,12 @@ def update_code(search, word_wordle_tuple):
         color='is_solution',
         hover_data=['impossible_pattern_count'],
         custom_data=['impossible_pattern_list'],
-        title='Scored solutions from shared patterns',
+        #  title='Scored solutions from shared patterns',
         labels={'norm_score': 'Normalized Score', 'word': 'Word'},
+    )
+    fig.update_layout(
+        margin=dict(l=0, r=0, t=0, b=0),
+        showlegend=False,
     )
     print(f'processing solution data {solution_data.shape}')
     solution_data = (
@@ -397,7 +437,14 @@ If this seems like a hacky post-hoc heuristic, [it definitely is!](https://marco
     )
 
     res = [
-        dcc.Graph(figure=fig, id='the-graph'),
+        [
+            make_headline_info_div(
+                'Scored solutions from shared patterns',
+                'Click to show impossible patterns',
+                id='headline-graph',
+            ),
+            dcc.Graph(figure=fig, id='the-graph'),
+        ],
         [dcc.Markdown(markdown_text, style={'text-align': 'left'}), thetable_div],
         #    f'{solution}|{wordle_num}',
     ]
