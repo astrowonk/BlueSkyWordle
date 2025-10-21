@@ -28,7 +28,7 @@ if __name__ == '__main__':
         stop_num = start_num
     if args.stop_num:
         assert args.start_num
-        stop_num = args.stop_num
+        stop_num = args.start_num
     failed_list = []
     for wordle_num in tqdm(range(start_num, stop_num + 1)):
         bsw = BlueskyWordle(use_limited_targets=True)
