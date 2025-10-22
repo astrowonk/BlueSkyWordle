@@ -399,8 +399,10 @@ def update_code(search, word_wordle_tuple):
     ]
     markdown_text = ''
     check_data = solution_data.sort('norm_score', descending=True)
-    if (check_data['norm_score'].item(0) - check_data['norm_score'].item(1) < 0.10) or (
-        check_data['impossible_pattern_count'].item(0) > 1
+    if (
+        (check_data['norm_score'].shape[0] == 1)
+        or (check_data['norm_score'].item(0) - check_data['norm_score'].item(1) < 0.10)
+        or (check_data['impossible_pattern_count'].item(0) > 1)
     ):
         cols = [
             'word',
@@ -527,6 +529,9 @@ def update_pattern_on_click(click_data, word_wordle_tuple):
             connection=con,
             execute_options={'parameters': [wordle_num, solution]},
         )
+        post_count = con.execute(
+            'select count(*) from posts where wordle_id = ? ', (wordle_num,)
+        ).fetchone()[0]
     num_pattern_list = sorted(
         [
             (key, val)
@@ -537,6 +542,8 @@ def update_pattern_on_click(click_data, word_wordle_tuple):
         key=lambda x: (-x[1], x[0]),
     )
     print(patterns, label)
+    if solution == 'grace':
+        print(num_pattern_list, len(num_pattern_list))
 
     weird_word_list = (
         num_pattern_df.with_columns(max_freq=pl.col('freq').max().over('pattern'))
@@ -582,6 +589,7 @@ def update_pattern_on_click(click_data, word_wordle_tuple):
                     'margin': '5px',
                 },
             ),
+            dcc.Markdown(f'Solved with {post_count} total posts.'),
         ],
         weird_guess_children,
     )
