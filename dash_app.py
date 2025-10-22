@@ -525,13 +525,14 @@ def update_pattern_on_click(click_data, word_wordle_tuple):
         label = click_data['points'][0]['label']
     with sqlite3.connect('wordle.db') as con:
         num_pattern_df = pl.read_database(
-            'select p.pattern,count,freq,wordle_id,guess from pattern_counts pc left join patterns p on p.pattern = pc.pattern  where wordle_id = ? and target = ? order by 1;',
+            'select pc.pattern,count,freq,wordle_id,guess from pattern_counts pc left join patterns p on pc.pattern = p.pattern and target = ? where pc.wordle_id = ? order by 1 desc;',
             connection=con,
-            execute_options={'parameters': [wordle_num, solution]},
+            execute_options={'parameters': [solution, wordle_num]},
         )
         post_count = con.execute(
             'select count(*) from posts where wordle_id = ? ', (wordle_num,)
         ).fetchone()[0]
+    print(num_pattern_df.shape)
     num_pattern_list = sorted(
         [
             (key, val)
@@ -541,7 +542,6 @@ def update_pattern_on_click(click_data, word_wordle_tuple):
         ],
         key=lambda x: (-x[1], x[0]),
     )
-    print(patterns, label)
     if solution == 'grace':
         print(num_pattern_list, len(num_pattern_list))
 
