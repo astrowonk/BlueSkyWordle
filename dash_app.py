@@ -78,56 +78,46 @@ def add_header_tooltip(header):
     #  print(f'the tooltip for column {simple_header} found is {tooltip}')
     thetarget = f'span-header-{simple_header}'
     if tooltip:
-        return html.Div(
-            [
-                html.Span(header),
-                html.I(
-                    id=thetarget,
-                    className='bi bi-info-circle-fill',
-                    style={
-                        'display': 'inline-block',
-                        'padding-left': '.5em',
-                    },
-                ),
-                dbc.Tooltip(dcc.Markdown(tooltip), target=thetarget, trigger='legacy'),
-            ]
-        )
+        return html.Div([
+            html.Span(header),
+            html.I(
+                id=thetarget,
+                className='bi bi-info-circle-fill',
+                style={
+                    'display': 'inline-block',
+                    'padding-left': '.5em',
+                },
+            ),
+            dbc.Tooltip(dcc.Markdown(tooltip), target=thetarget, trigger='legacy'),
+        ])
     return html.Div(header)
 
 
-tab1_content = html.Div(
-    [
-        html.H1(children='Wordle Solution Explorer App', style={'textAlign': 'center'}),
-        html.Div(
-            id='dropdown-div',
-            children=dbc.Select(
-                id='wordle-input', persistence=True, persistence_type='session'
-            ),
-        ),
-        dbc.Container(
-            children=[
-                html.Div(
+tab1_content = html.Div([
+    html.H1(children='Wordle Solution Explorer App', style={'textAlign': 'center'}),
+    html.Div(
+        id='dropdown-div',
+        children=dbc.Select(id='wordle-input', persistence=True, persistence_type='session'),
+    ),
+    dbc.Container(
+        children=[
+            html.Div([
+                dbc.Row(
                     [
-                        dbc.Row(
-                            [
-                                dbc.Col(
-                                    [
-                                        html.Div(id='pattern-div'),
-                                    ]
-                                ),
-                                dbc.Col(html.Div(id='graph-div')),
-                            ],
-                        ),
-                        dbc.Row(html.Div(id='weird-guesses')),
-                        dbc.Row(html.Div(id='table-div')),
-                    ]
-                )
-            ],
-            # id='my-output',
-            style={'text-align': 'center', 'margin': 'auto'},
-        ),
-    ]
-)
+                        dbc.Col([
+                            html.Div(id='pattern-div'),
+                        ]),
+                        dbc.Col(html.Div(id='graph-div')),
+                    ],
+                ),
+                dbc.Row(html.Div(id='weird-guesses')),
+                dbc.Row(html.Div(id='table-div')),
+            ])
+        ],
+        # id='my-output',
+        style={'text-align': 'center', 'margin': 'auto'},
+    ),
+])
 
 with open('README.md', 'r') as f:
     tab_about_content = f.read()
@@ -563,7 +553,7 @@ def update_pattern_on_click(click_data, word_wordle_tuple):
         [
             make_headline_info_div(
                 f'Highlighting Impossible Patterns for {label.upper()}',
-                f'These are "impossible" patterns that can not be made if **{label}** was the solution.',
+                f'These are "impossible" patterns that can not be made if **{label}** was the solution (indicating that it is likely not the solution)',
                 id='highlight-impossible',
             )
             if patterns
