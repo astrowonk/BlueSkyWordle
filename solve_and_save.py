@@ -57,7 +57,7 @@ if __name__ == '__main__':
                 con.execute('delete from solutions where wordle_id = ?;', (wordle_num,))
             except sqlite3.Error:
                 print('delete failed')
-        res = bsw.solve(wordle_num)
+        res = bsw.solve(wordle_num, mask_result=True)
         if not res:
             failed_list.append(wordle_num)
         bsw.best_df.with_columns(
