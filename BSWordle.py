@@ -111,21 +111,19 @@ class BlueskyWordle:
 
     @staticmethod
     def make_df_from_dict(res_dict):
-        return pl.DataFrame(
-            [
-                {
-                    'word': word,
-                    'score': d['score'],
-                    'total_valid_patterns': d['total_valid_patterns'],
-                    #'total_possible_score': d['ftotal_possible_score'],
-                    'valid_patterns_found': d['valid_patterns_found'],
-                    'impossible_pattern_count': d['impossible_pattern_count'],
-                    'impossible_pattern_list': d['bad_pattern_list'],
-                    #    'strongest_signal_patterns': [x[1] for x in d['strongest_signals']],
-                }
-                for word, d in res_dict.items()
-            ]
-        )
+        return pl.DataFrame([
+            {
+                'word': word,
+                'score': d['score'],
+                'total_valid_patterns': d['total_valid_patterns'],
+                #'total_possible_score': d['ftotal_possible_score'],
+                'valid_patterns_found': d['valid_patterns_found'],
+                'impossible_pattern_count': d['impossible_pattern_count'],
+                'impossible_pattern_list': d['bad_pattern_list'],
+                #    'strongest_signal_patterns': [x[1] for x in d['strongest_signals']],
+            }
+            for word, d in res_dict.items()
+        ])
 
     def build_counter(self, df):
         guess_list = self.dataframe_to_list(df)
@@ -413,8 +411,8 @@ class BlueskyWordle:
         ).with_columns(
             is_solution=pl.col('hashed_word').eq(self.hashed_solution).cast(pl.Int8)
         )
-        if mask_result:
-            self.best_df = self.best_df.with_columns(word=pl.col('hashed_word'))
+        #   if mask_result:
+        #      self.best_df = self.best_df.with_columns(word=pl.col('hashed_word'))
         if plot:
             return self.make_plot(self.best_df.sort('norm_score'))
         print(f'Result confirmation: {result}')
@@ -442,13 +440,11 @@ class BlueskyWordle:
         out = []
         thedict = (
             (
-                pd.Series(
-                    {
-                        key: val
-                        for key, val in self.counter_data_openers.get(word, {}).items()
-                        if key != '22222'
-                    }
-                )
+                pd.Series({
+                    key: val
+                    for key, val in self.counter_data_openers.get(word, {}).items()
+                    if key != '22222'
+                })
                 // 100
                 - 1
             )
