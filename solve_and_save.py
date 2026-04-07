@@ -19,8 +19,6 @@ if __name__ == '__main__':
     parser.add_argument('stop_num', type=int, nargs='?', default=None)
     parser.add_argument('--skip-existing', action='store_true', default=False)
     args = parser.parse_args()
-    print('args stop num')
-    print(args.stop_num)
 
     with sqlite3.connect('wordle.db') as con:
         df = pl.read_database(
@@ -39,8 +37,8 @@ if __name__ == '__main__':
         start_num = max_wordle
         stop_num = todays_wordle_num
     if args.stop_num:
-        assert args.start_num
-        stop_num = args.start_num
+        assert args.stop_num
+        stop_num = args.stop_num
 
     print(start_num, stop_num)
     failed_list = []
