@@ -19,6 +19,8 @@ if __name__ == '__main__':
     parser.add_argument('stop_num', type=int, nargs='?', default=None)
     parser.add_argument('--skip-existing', action='store_true', default=False)
     args = parser.parse_args()
+    print('args stop num')
+    print(args.stop_num)
 
     with sqlite3.connect('wordle.db') as con:
         df = pl.read_database(
