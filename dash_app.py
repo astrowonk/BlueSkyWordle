@@ -162,7 +162,7 @@ tab2_markdown_text = f"""
 * Failed Wordles (Norm score metric only): {df_bad_norm_scores.shape[0]}
 * Failed Wordles (KS Statistic Rank only): {df_bad_kstats.shape[0]}
 * Failed Wordles (Fraction Found Rank only): {df_bad_fraction_found.shape[0]}
-* Percentage Solved Correctly^*^ with Current Algorithm: **{df_pct_correct:.1%}
+* Percentage Solved Correctly **with Current Algorithm: **{df_pct_correct:.1%}
 
 """
 
@@ -272,7 +272,8 @@ def make_table_div(_):
     with sqlite3.connect('wordle.db') as con:
         print('reading solutions db')
         df = (
-            pl.read_database(
+            pl
+            .read_database(
                 'select word, norm_score_rank,impossible_pattern_count,cast(metric_sum as INTEGER) metric_sum,metric_sum_rank from ranked_view where is_solution  = 1 and norm_score_rank <> 1 order by 2 DESC',
                 connection=con,
             )
@@ -333,7 +334,8 @@ def update_code(search, word_wordle_tuple):
     print('making figure')
 
     fig = px.bar(
-        solution_data.sort('norm_score')
+        solution_data
+        .sort('norm_score')
         .tail(10)
         .with_columns(is_solution=pl.col('is_solution').cast(pl.Boolean)),
         y='word',
@@ -350,16 +352,19 @@ def update_code(search, word_wordle_tuple):
     )
     print(f'processing solution data {solution_data.shape}')
     solution_data = (
-        solution_data.sort('impossible_pattern_count')
+        solution_data
+        .sort('impossible_pattern_count')
         .with_columns(
             pl.col(['kstatistic']).rank(descending=False, method='min').name.suffix('_rank'),
-            pl.col(['fraction_found', 'norm_score'])
+            pl
+            .col(['fraction_found', 'norm_score'])
             .rank(descending=True)
             .cast(pl.Int16)
             .name.suffix('_rank'),
         )
         .with_columns(
-            is_solution=pl.col('is_solution')
+            is_solution=pl
+            .col('is_solution')
             .cast(pl.Boolean)
             .cast(pl.String)
             .str.to_titlecase(),
@@ -421,7 +426,8 @@ If this seems like a hacky post-hoc heuristic, [it definitely is!](https://marco
 
     print('making table')
     thetable_div = dbc.Table.from_enhanced_dataframe(
-        solution_data.select(cols)
+        solution_data
+        .select(cols)
         .rename({'word': 'candidate'})
         .to_pandas(use_pyarrow_extension_array=True),
         header_callable=add_header_tooltip,
@@ -526,7 +532,8 @@ def update_pattern_on_click(click_data, word_wordle_tuple):
     num_pattern_list = sorted(
         [
             (key, val)
-            for key, val in num_pattern_df.unique(subset=['pattern', 'count'])
+            for key, val in num_pattern_df
+            .unique(subset=['pattern', 'count'])
             .select(['pattern', 'count'])
             .iter_rows()
         ],
@@ -536,7 +543,8 @@ def update_pattern_on_click(click_data, word_wordle_tuple):
         print(num_pattern_list, len(num_pattern_list))
 
     weird_word_list = (
-        num_pattern_df.with_columns(max_freq=pl.col('freq').max().over('pattern'))
+        num_pattern_df
+        .with_columns(max_freq=pl.col('freq').max().over('pattern'))
         .filter(pl.col('freq').lt(1e5) & pl.col('count').eq(1) & pl.col('max_freq').lt(1e5))[
             'guess'
         ]
