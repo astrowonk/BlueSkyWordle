@@ -9,8 +9,7 @@ from time import sleep
 
 
 def get_bluesky_posts(wordle_num, max_posts=400, refresh_data=False):
-    """Helper function, requires searchtweets v2 and proper Twitter api credentials. Turns a single wordle
-    query into a dataframe that can be used inside the TwitterWordle class."""
+    """Helper function, requires atproto library."""
     with sqlite3.connect('wordle.db') as con:
         df = pl.read_database(
             'select * from posts where wordle_id = ?',
@@ -25,10 +24,15 @@ def get_bluesky_posts(wordle_num, max_posts=400, refresh_data=False):
     wordle_num_str = f'{wordle_num:,}'
     out = client.app.bsky.feed.search_posts({'q': f'wordle {wordle_num_str}', 'limit': 100})
     orig = [(x['record']['text'], wordle_num_str) for x in out.model_dump()['posts']]
-    for cursor in [str(x) for x in (range(99, max_posts - 100, 100))]:
-        out = client.app.bsky.feed.search_posts(
-            {'q': f'wordle {wordle_num_str}', 'limit': 100, 'cursor': cursor}
-        )
+
+    while len(orig) < max_posts:
+        cursor = out.cursor
+        print(cursor)
+        out = client.app.bsky.feed.search_posts({
+            'q': f'wordle {wordle_num_str}',
+            'limit': 100,
+            'cursor': cursor,
+        })
         new = [(x['record']['text'], wordle_num_str) for x in out.model_dump()['posts']]
         orig.extend(new)
     orig = list(set(orig))
