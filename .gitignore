@@ -5,3 +5,4 @@ wordle.db
 wordle_old.db
 wordle_backup.db
 *.html
+wordle_rejected_by_new_regex.csv

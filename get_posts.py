@@ -27,7 +27,7 @@ def get_bluesky_posts(wordle_num, max_posts=400, refresh_data=False):
 
     while len(orig) < max_posts:
         cursor = out.cursor
-        print(cursor)
+        #  print(cursor)
         out = client.app.bsky.feed.search_posts({
             'q': f'wordle {wordle_num_str}',
             'limit': 100,

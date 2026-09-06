@@ -188,7 +188,7 @@ tabs = dbc.Tabs(
             html.Div(
                 id='bad-solution-tab',
             ),
-            label='List of Near-Fails',
+            label='List of Fails and Near-Fails',
         ),
     ],
     active_tab='main-tab',
@@ -274,7 +274,7 @@ def make_table_div(_):
         df = (
             pl
             .read_database(
-                'select word, norm_score_rank,impossible_pattern_count,cast(metric_sum as INTEGER) metric_sum,metric_sum_rank from ranked_view where is_solution  = 1 and norm_score_rank <> 1 order by 2 DESC',
+                'select word, norm_score_rank,impossible_pattern_count,cast(metric_sum as INTEGER) metric_sum,metric_sum_rank from ranked_view where is_solution  = 1 and (norm_score_rank <> 1 or metric_sum_rank <>1) order by metric_sum_rank DESC, norm_score_rank desc',
                 connection=con,
             )
             .with_columns(
