@@ -1,4 +1,4 @@
-extend-select = [
+lint.extend-select = [
     # "PLE0011",  # unrecognized-inline-option
     # "PLE0013",  # bad-plugin-value
     # "PLE0014",  # bad-configuration-section
@@ -16,9 +16,7 @@ extend-select = [
     # "PLE0111",  # bad-reversed-sequence
     "F622", # too-many-star-expressions
     # "PLE0113",  # invalid-star-assignment-target
-    # "PLE0114",  # star-needs-assignment-target
     "PLE0115", # nonlocal-and-global
-    "PLE0116", # continue-in-finally
     "PLE0117", # nonlocal-without-binding
     # "PLE0118",  # used-prior-global-declaration
     # "PLE0119",  # misplaced-format-function
@@ -35,6 +33,7 @@ extend-select = [
     # "PLE0242",  # class-variable-slots-conflict
     # "PLE0243",  # invalid-class-object
     # "PLE0244",  # invalid-enum-extension
+    # "PLE0245",  # declare-non-slot
     # "PLE0301",  # non-iterator-returned
     "PLE0302", # unexpected-special-method-signature
     # "PLE0303",  # invalid-length-returned
@@ -93,6 +92,7 @@ extend-select = [
     "PLE1142", # await-outside-async
     # "PLE1143",  # unhashable-member
     # "PLE1144",  # invalid-slice-step
+    # "PLE1145",  # async-context-manager-with-regular-with
     # "PLE1200",  # logging-unsupported-format
     # "PLE1201",  # logging-format-truncated
     "PLE1205", # logging-too-many-args
@@ -111,6 +111,10 @@ extend-select = [
     "PLE1520", # singledispatchmethod-function
     # "PLE1700",  # yield-inside-async-function
     # "PLE1701",  # not-async-context-manager
+    # "PLE1901",  # bare-name-capture-pattern
+    # "PLE1902",  # invalid-match-args-definition
+    # "PLE1903",  # too-many-positional-sub-patterns
+    # "PLE1904",  # multiple-class-sub-patterns
     # "PLE2501",  # invalid-unicode-codec
     "PLE2502", # bidirectional-unicode
     "PLE2510", # invalid-character-backspace
@@ -128,11 +132,15 @@ extend-select = [
     # "PLF0010",  # parse-error
     # "PLF0011",  # config-parse-error
     # "PLF0202",  # method-check-failed
-    # "PLR0917",  # too-many-positional
-    # "PLR1737",  # use-yield-from
+    "PLR0917", # too-many-positional-arguments
+    "UP028",   # use-yield-from
+    # "PLR1905",  # match-class-bind-self
+    # "PLR1906",  # match-class-positional-attributes
     # "PLW0101",  # unreachable
     "F601", # duplicate-key
     # "PLW0135",  # contextmanager-generator-missing-cleanup
+    "PLE0116", # continue-in-finally
+    # "PLW0137",  # break-in-finally
     "E703",    # unnecessary-semicolon
     "PLW0602", # global-variable-not-assigned
     "F841",    # unused-variable
@@ -140,12 +148,15 @@ extend-select = [
     "F521",    # bad-format-string
     "W605",    # anomalous-backslash-in-string
     "PLW1501", # bad-open-mode
+    # "PLW2603",  # using-exception-groups-in-unsupported-version
+    # "PLW2604",  # using-generic-type-syntax-in-unsupported-version
+    # "PLW2605",  # using-assignment-expression-in-unsupported-version
+    # "PLW2606",  # using-positional-only-args-in-unsupported-version
     # "PLW4906",  # deprecated-attribute
 ]
 
-ignore = [
-    "call-datetime-without-tzinfo",
-    "N815",                         # invalid-name
+lint.ignore = [
+    "N815", # invalid-name
     # "PLC0104",  # disallowed-name
     # "PLC0105",  # typevar-name-incorrect-variance
     "D419", # empty-docstring
@@ -233,8 +244,8 @@ ignore = [
     "PLR1704", # redefined-argument-from-local
     "RET505",  # no-else-return
     # "PLR1706",  # consider-using-ternary
-    "COM818", # trailing-comma-tuple
-    # "PLR1708",  # stop-iteration-return
+    "COM818",  # trailing-comma-tuple
+    "PLR1708", # stop-iteration-return
     # "PLR1709",  # simplify-boolean-expression
     "RET501",  # inconsistent-return-statements
     "RET502",  # inconsistent-return-statements
@@ -331,9 +342,10 @@ ignore = [
     # "PLW0641",  # possibly-unused-variable
     # "PLW0642",  # self-cls-assignment
     # "PLW0644",  # unbalanced-dict-unpacking
-    "E722", # bare-except
-    "B014", # duplicate-except
-    "B904", # raise-missing-from
+    "E722",   # bare-except
+    "B014",   # duplicate-except
+    "TRY203", # try-except-raise
+    "B904",   # raise-missing-from
     # "PLW0715",  # raising-format-tuple
     # "PLW0716",  # wrong-exception-operation
     "BLE001", # broad-exception-caught
@@ -384,3 +396,7 @@ ignore = [
     # "PLW4904",  # deprecated-class
     # "PLW4905",  # deprecated-decorator
 ]
+
+[format]
+quote-style = "single"
+docstring-code-format = true
