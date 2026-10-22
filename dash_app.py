@@ -229,7 +229,11 @@ app.layout = dbc.Container(
 def wrap_pattern(pattern_tuple, solution, num_pattern_df, impossible_patterns=[]):
     pattern, count = pattern_tuple
     top_words_for_pattern = (
-        num_pattern_df.filter(pl.col('pattern').eq(pattern))['guess'].sort().to_list()
+        num_pattern_df.filter(
+            pl.col('pattern').eq(pattern),
+        )
+        .sort(descending=True, by='freq')['guess']
+        .to_list()
     )
     # print(pattern, impossible_patterns)
     return html.Div(
@@ -532,7 +536,7 @@ def update_pattern_on_click(click_data, word_wordle_tuple):
         num_pattern_df = pl.read_database(
             'select pc.pattern,count,freq,wordle_id,guess from pattern_counts pc left join patterns p on pc.pattern = p.pattern and target = ? where pc.wordle_id = ? order by 1 desc;',
             connection=con,
-            execute_options={'parameters': [solution, wordle_num]},
+            execute_options={'parameters': [label, wordle_num]},
         )
         post_count = con.execute(
             'select count(*) from posts where wordle_id = ? ', (wordle_num,)
@@ -579,7 +583,7 @@ def update_pattern_on_click(click_data, word_wordle_tuple):
                 [
                     wrap_pattern(
                         x,
-                        solution=solution,
+                        solution=label,
                         impossible_patterns=patterns,
                         num_pattern_df=num_pattern_df,
                     )
