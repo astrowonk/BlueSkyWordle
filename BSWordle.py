@@ -96,6 +96,7 @@ class BlueskyWordle:
         )
         if self.filter_posts:
             self.df = self.df.filter(pl.col('post_text').str.contains(WORDLE_SHARE))
+            self.df = self.df.remove(pl.col('post_text').str.contains('wordle.at'))
         self.first_guesses = self.df['first_guess'].explode().drop_nulls().to_list()
         print(
             f'Bulding pattern list for {self.wordle_num} using {self.df.shape[0]} posts.'
@@ -372,7 +373,7 @@ class BlueskyWordle:
             #    and best_df['impossible_pattern_count'].mean() > 5
             #    and best_df['impossible_pattern_count'].item(0) > 0
         ):
-            print('Low score metric. Resorting.')
+            print('Low score metric or non-zero impossible pattern count. Resorting.')
             best_df = (
                 best_df.filter(pl.col('impossible_pattern_count').le(50))
                 .sort('impossible_pattern_count')

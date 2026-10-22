@@ -17,28 +17,34 @@ def get_bluesky_posts(wordle_num, max_posts=400, refresh_data=False):
             connection=con,
         )
     if not df.is_empty() and not refresh_data:
-        print('retrieved from database')
+        print(f'retrieved from database {df.shape}')
         return df
     client = Client()
     _ = client.login(bluesky_login, bluesky_password)
     wordle_num_str = f'{wordle_num:,}'
-    out = client.app.bsky.feed.search_posts({'q': f'wordle {wordle_num_str}', 'limit': 100})
+    out = client.app.bsky.feed.search_posts(
+        {'q': f'wordle {wordle_num_str}', 'limit': 100}
+    )
     orig = [(x['record']['text'], wordle_num_str) for x in out.model_dump()['posts']]
 
     while len(orig) < max_posts:
         cursor = out.cursor
         #  print(cursor)
-        out = client.app.bsky.feed.search_posts({
-            'q': f'wordle {wordle_num_str}',
-            'limit': 100,
-            'cursor': cursor,
-        })
+        out = client.app.bsky.feed.search_posts(
+            {
+                'q': f'wordle {wordle_num_str}',
+                'limit': 100,
+                'cursor': cursor,
+            }
+        )
         new = [(x['record']['text'], wordle_num_str) for x in out.model_dump()['posts']]
         orig.extend(new)
     orig = list(set(orig))
     df = pl.DataFrame([{'post_text': x, 'wordle_id': wordle_num} for x, y in orig])
     with sqlite3.connect('wordle.db') as con:
         con.execute('delete from posts where wordle_id = ?', (wordle_num,))
-    df.write_database('posts', connection='sqlite:///wordle.db', if_table_exists='append')
+    df.write_database(
+        'posts', connection='sqlite:///wordle.db', if_table_exists='append'
+    )
     # sleep(5)
     return df
